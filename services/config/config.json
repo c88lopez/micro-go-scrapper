@@ -1,0 +1,58 @@
+{
+  "services": [
+    "influxdb",
+    "postgres",
+    "rabbitmq",
+    "core",
+    "provider1",
+    "provider2",
+    "provider3",
+    "provider4",
+    "provider5",
+    "telegram",
+    "showcase_server"
+  ],
+  "dependencies": {
+    "core": [
+      "influxdb",
+      "postgres",
+      "rabbitmq"
+    ],
+    "telegram": [
+      "influxdb",
+      "postgres",
+      "rabbitmq"
+    ],
+    "provider1": [
+      "influxdb",
+      "rabbitmq"
+    ],
+    "provider2": [
+      "influxdb",
+      "rabbitmq"
+    ],
+    "provider3": [
+      "influxdb",
+      "rabbitmq"
+    ],
+    "provider4": [
+      "influxdb",
+      "rabbitmq"
+    ],
+    "provider5": [
+      "influxdb",
+      "rabbitmq"
+    ],
+    "showcase_server": [
+      "influxdb",
+      "postgres"
+    ]
+  },
+  "aliases": {
+    "provider1": "provider",
+    "provider2": "provider",
+    "provider3": "provider",
+    "provider4": "provider",
+    "provider5": "provider"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "enabled": false,
+  "url": "http://influxdb:8086",
+  "database": "sarasa"
+}

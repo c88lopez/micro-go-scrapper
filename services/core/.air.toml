@@ -1,0 +1,21 @@
+root = "/go/src"
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  args_bin = []
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main ."
+  delay = 1000
+  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  exclude_file = []
+  exclude_regex = ["_test.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  include_dir = ["app", "sarasa"]
+  include_ext = ["go", "json", "toml"]
+  kill_delay = "500ms"
+  log = "build-errors.log"
+  send_interrupt = true
+  stop_on_error = true
