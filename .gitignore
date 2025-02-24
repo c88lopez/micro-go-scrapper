@@ -1,0 +1,17 @@
+.idea
+*.swp
+
+services/core/core
+services/provider1/provider1
+services/provider2/provider2
+services/provider3/provider3
+services/telegram/telegram
+
+volumes/postgres
+volumes/tick/data
+volumes/redis
+
+showcase_web/node_modules
+showcase_web/.next
+
+services/**/tmp

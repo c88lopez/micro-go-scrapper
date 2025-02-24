@@ -1,0 +1,259 @@
+version: '3'
+
+services:
+  # Define the web service
+  showcase_web:
+    build:
+      context: .
+      dockerfile: DockerfileShowcaseWeb
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    env_file:
+      - config.env
+      - showcase_web.config.env
+    volumes:
+      - ./services/showcase_web:/app
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  # Define the core service
+  showcase_server:
+    build:
+      context: .
+      dockerfile: DockerfileShowcaseServer
+    ports:
+      - "8080:8080"
+    env_file:
+      - config.env
+    volumes:
+      - ./services/showcase_server:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  config:
+    build:
+      context: .
+      dockerfile: DockerfileConfig
+    volumes:
+      - ./services/config:/go/src/app
+      - ./libs:/usr/local/go/src/sarasa/libs
+    ports:
+      - "8090:8090"
+    networks:
+      - backend
+    labels:
+      - docker.group=sarasa
+
+  # Define the core service
+  core:
+    build:
+      context: .
+      dockerfile: DockerfileCore
+    env_file:
+      - config.env
+    volumes:
+      - ./services/core:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  # Define the provider's services
+  provider1:
+    build:
+      context: .
+      dockerfile: DockerfileProviders
+      args:
+        providerID: 1
+    env_file:
+      - config.env
+    volumes:
+      - ./services/provider1:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  provider2:
+    build:
+      context: .
+      dockerfile: DockerfileProviders
+      args:
+        providerID: 2
+    env_file:
+      - config.env
+    volumes:
+      - ./services/provider2:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  provider3:
+    build:
+      context: .
+      dockerfile: DockerfileProviders
+      args:
+        providerID: 3
+    env_file:
+      - config.env
+    volumes:
+      - ./services/provider3:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  provider4:
+    build:
+      context: .
+      dockerfile: DockerfileProviders
+      args:
+        providerID: 4
+    env_file:
+      - config.env
+    volumes:
+      - ./services/provider4:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  provider5:
+    build:
+      context: .
+      dockerfile: DockerfileProviders
+      args:
+        providerID: 5
+    env_file:
+      - config.env
+    volumes:
+      - ./services/provider5:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  telegram:
+    build:
+      context: .
+      dockerfile: DockerfileTelegram
+    env_file:
+      - config.env
+    volumes:
+      - ./services/telegram:/go/src/app
+      - ./schemas:/usr/local/go/src/sarasa/schemas
+      - ./libs:/usr/local/go/src/sarasa/libs
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  # Define a PostgreSQL service
+  postgres:
+    image: postgres:12
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  # Define a RabbitMQ service
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./volumes/rabbitmq:/etc/rabbitmq
+    networks:
+      - backend
+      - tick
+    labels:
+      - docker.group=sarasa
+
+  # Define a Telegraf service
+  telegraf:
+    image: telegraf:1.14.2-alpine
+    volumes:
+      - ./volumes/tick/etc/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - tick
+    links:
+      - influxdb
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+    labels:
+      - docker.group=sarasa
+
+  # Define an InfluxDB service
+  influxdb:
+    image: influxdb:1.7.10-alpine
+    volumes:
+      - ./volumes/tick/data/influxdb:/var/lib/influxdb
+    networks:
+      - tick
+    ports:
+      - "8086:8086"
+    labels:
+      - docker.group=sarasa
+
+  # Define a Grafana service
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./volumes/tick/data/grafana:/var/lib/grafana
+      - ./volumes/tick/etc/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+    networks:
+      - tick
+    ports:
+      - "3000:3000"
+    links:
+      - influxdb
+    labels:
+      - docker.group=sarasa
+
+networks:
+  backend:
+    driver: bridge
+  tick:
+    driver: bridge

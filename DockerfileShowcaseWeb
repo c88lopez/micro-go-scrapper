@@ -1,0 +1,7 @@
+FROM node:stretch
+
+WORKDIR /app
+
+COPY services/show_web .
+
+CMD ["npm", "run", "dev"]
